@@ -23,6 +23,8 @@ import { Ticket, TicketStatus } from "./interfaces/Ticket";
 import TableTickets from "./components/TableTickets";
 import { exportTableToExcel } from "./utils/exportExcel";
 import { formatTicket } from "./utils/formatTicket";
+import SnackbarTicket from "./components/SnackbarTicket";
+import { useRouter } from "next/navigation";
 
 const getTicketsFromLocalStorage = () => {
   const savedTickets = localStorage.getItem("tickets");
@@ -37,6 +39,9 @@ export default function TicketList() {
   const [open, setOpen] = useState(false);
   const [openStartTicket, setOpenStartTicket] = useState(false);
   const [currentTicket, setCurrentTicket] = useState<Ticket | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const router = useRouter();
 
   const {
     handleSubmit,
@@ -67,6 +72,57 @@ export default function TicketList() {
     setTickets([...tickets, newTicket]);
     reset();
     handleClose();
+  };
+
+  const onSubmitStart = (data: Ticket) => {
+    const baseConfigFile = data.configFile.split(".")[0];
+    const baseConfigFileExtension = data.configFile.split(".")[1];
+    const baseRuntaskFile = data.runtaskFile.split(".")[0];
+    const baseRuntaskFileExtension = data.runtaskFile.split(".")[1];
+
+    if (baseConfigFileExtension !== "config" || !baseConfigFileExtension) {
+      setSnackbarMessage("Config file debe ser de tipo .config");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    if (baseRuntaskFileExtension !== "runtask" || !baseRuntaskFileExtension) {
+      setSnackbarMessage("Runtask file debe ser de tipo .runtask");
+      setOpenSnackbar(true);
+      return;
+    }
+
+    if (baseConfigFile !== baseRuntaskFile) {
+      setSnackbarMessage(
+        "Config file y Runtask file deben tener el mismo nombre base."
+      );
+      setOpenSnackbar(true);
+      return;
+    }
+
+    const ticket = tickets.find((ticket) => ticket.id === currentTicket?.id);
+
+    if (ticket) {
+      const updatedTickets = tickets.map((ticket) =>
+        ticket.id === currentTicket?.id
+          ? {
+              ...ticket,
+              configFile: data.configFile,
+              runtaskFile: data.runtaskFile,
+            }
+          : ticket
+      );
+      setTickets(updatedTickets);
+
+      const ticketSelected = updatedTickets.find(
+        (ticket) => ticket.id === currentTicket?.id
+      );
+
+      localStorage.setItem("selectedTicket", JSON.stringify(ticketSelected));
+      handleCloseStartTicket();
+
+      router.push("/ticket");
+    }
   };
 
   const handleDelete = useCallback(
@@ -116,7 +172,9 @@ export default function TicketList() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("tickets", JSON.stringify(tickets));
+    if (tickets.length > 0) {
+      localStorage.setItem("tickets", JSON.stringify(tickets));
+    }
   }, [tickets]);
 
   useEffect(() => {
@@ -206,8 +264,25 @@ export default function TicketList() {
         <DialogContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Controller
+              name="link"
+              control={control}
+              defaultValue=""
+              rules={{ required: "Link is required" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Link"
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.link}
+                  helperText={errors.link?.message}
+                />
+              )}
+            />
+            <Controller
               name="createdAt"
               control={control}
+              defaultValue=""
               rules={{ required: "Created At is required" }}
               render={({ field }) => (
                 <TextField
@@ -223,11 +298,12 @@ export default function TicketList() {
             <Controller
               name="user"
               control={control}
+              defaultValue=""
               rules={{ required: "User is required" }}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="User"
+                  label="Usuario"
                   fullWidth
                   margin="normal"
                   error={!!errors.user}
@@ -238,6 +314,7 @@ export default function TicketList() {
             <Controller
               name="po"
               control={control}
+              defaultValue=""
               rules={{ required: "PO is required" }}
               render={({ field }) => (
                 <TextField
@@ -254,6 +331,7 @@ export default function TicketList() {
               name="status"
               control={control}
               rules={{ required: "Status is required" }}
+              defaultValue="Creado"
               render={({ field }) => (
                 <FormControl fullWidth margin="normal" error={!!errors.status}>
                   <InputLabel>Status</InputLabel>
@@ -267,21 +345,6 @@ export default function TicketList() {
                     <FormHelperText>{errors.status.message}</FormHelperText>
                   )}
                 </FormControl>
-              )}
-            />
-            <Controller
-              name="link"
-              control={control}
-              rules={{ required: "Link is required" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Link"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.link}
-                  helperText={errors.link?.message}
-                />
               )}
             />
           </form>
@@ -300,16 +363,76 @@ export default function TicketList() {
         <DialogTitle>Iniciar Ticket</DialogTitle>
         <DialogContent>
           <Typography>Iniciar el ticket: {currentTicket?.ticketId}</Typography>
-          <Typography>User: {currentTicket?.user}</Typography>
+          <Typography>Usuario: {currentTicket?.user}</Typography>
           <Typography>Status: {currentTicket?.status}</Typography>
+          <form onSubmit={handleSubmit(onSubmitStart)}>
+            <Controller
+              name="configFile"
+              control={control}
+              defaultValue={currentTicket?.configFile || ""}
+              rules={{ required: "Config file es requerido" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Config File"
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.configFile}
+                  helperText={errors.configFile?.message}
+                />
+              )}
+            />
+            <Controller
+              name="runtaskFile"
+              control={control}
+              defaultValue={currentTicket?.runtaskFile || ""}
+              rules={{ required: "Runtask file es requerido" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Runtask File"
+                  fullWidth
+                  margin="normal"
+                  error={!!errors.runtaskFile}
+                  helperText={errors.runtaskFile?.message}
+                />
+              )}
+            />
+            {/* <Controller
+              name="description"
+              control={control}
+              defaultValue=""
+              rules={{ required: "Description es requerida" }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Descripción"
+                  fullWidth
+                  margin="normal"
+                  multiline
+                  rows={4}
+                  error={!!errors.description}
+                  helperText={errors.description?.message}
+                />
+              )}
+            /> */}
+          </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseStartTicket} color="secondary">
-            Close
+            Cerrar
           </Button>
-          <Button color="primary">Confirm Start</Button>
+          <Button color="primary" onClick={handleSubmit(onSubmitStart)}>
+            Confirmar Inicio
+          </Button>
         </DialogActions>
       </Dialog>
+
+      <SnackbarTicket
+        openSnackbar={openSnackbar}
+        setOpenSnackbar={setOpenSnackbar}
+        snackbarMessage={snackbarMessage}
+      />
     </Container>
   );
 }

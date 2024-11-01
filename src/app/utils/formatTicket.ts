@@ -1,6 +1,9 @@
+import moment from "moment";
 import { Ticket } from "../interfaces/Ticket";
 
 export const formatTicket = (ticket: Ticket): Ticket => {
+  const formattedDate = formatDateWithMoment(new Date());
+
   return {
     ...ticket,
     id: new Date().getTime(),
@@ -8,6 +11,7 @@ export const formatTicket = (ticket: Ticket): Ticket => {
     po: formatTicketName(ticket.po),
     folder: formatTicketLink(ticket.link, ticket.user),
     ticketId: ticket.link.split("/").pop() || "",
+    createdAt: `${formattedDate} ${ticket.createdAt}`,
   };
 };
 
@@ -46,4 +50,8 @@ const formatTicketLink = (link: string, user: string) => {
 
   const formattedUser = formatTicketName(user).replace(" ", "");
   return `${ticketId}_${formattedUser}`;
+};
+
+const formatDateWithMoment = (date: Date) => {
+  return moment(date).format("DD/MM/YYYY");
 };

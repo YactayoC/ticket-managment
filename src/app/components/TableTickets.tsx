@@ -20,6 +20,17 @@ const TableTickets = (props: Props) => {
   };
 
   const columns: GridColDef[] = [
+    {
+      field: "link",
+      headerName: "Link",
+      width: 200,
+      renderCell: (params) => (
+        <Link href={params.value} target="_blank" rel="noopener">
+          {params.row.ticketId}
+        </Link>
+      ),
+    },
+    { field: "createdAt", headerName: "Created At", width: 150 },
     { field: "ticketId", headerName: "Ticket ID", width: 150 },
     { field: "user", headerName: "User", width: 150 },
     { field: "po", headerName: "PO", width: 150 },
@@ -42,17 +53,6 @@ const TableTickets = (props: Props) => {
         </Select>
       ),
     },
-    {
-      field: "link",
-      headerName: "Link",
-      width: 200,
-      renderCell: (params) => (
-        <Link href={params.value} target="_blank" rel="noopener">
-          {params.row.ticketId}
-        </Link>
-      ),
-    },
-    { field: "createdAt", headerName: "Created At", width: 150 },
     {
       field: "Acciones",
       headerName: "Acciones",
