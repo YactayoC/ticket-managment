@@ -19,7 +19,10 @@ const formatTicketName = (user: string) => {
   const capitalize = (str: string) =>
     str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
 
-  const parts = user.split(" ");
+  const parts = user
+    .trim()
+    .split(" ")
+    .filter((part) => part !== "");
 
   if (parts.length === 1) {
     return capitalize(parts[0]);
