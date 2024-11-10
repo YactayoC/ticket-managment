@@ -96,18 +96,27 @@ const TableTickets = (props: Props) => {
           sx={{
             "& .status-creado": {
               backgroundColor: "#F3F4F6",
+              "&:hover": {
+                backgroundColor: "#e0e0e0",
+              },
             },
             "& .status-ejecucion": {
               backgroundColor: "#FFF9C4",
+              "&:hover": {
+                backgroundColor: "#ffe08b",
+              },
             },
             "& .status-observacion": {
               backgroundColor: "#F2DEDE",
+              "&:hover": {
+                backgroundColor: "#e6bcbc",
+              },
             },
             "& .status-finalizado": {
               backgroundColor: "#DFF0D8",
-            },
-            "& .MuiDataGrid-row:hover": {
-              backgroundColor: "#f5f5f5",
+              "&:hover": {
+                backgroundColor: "#b2d8b2",
+              },
             },
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "#e0e0e0",
