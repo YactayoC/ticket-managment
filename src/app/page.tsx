@@ -188,217 +188,235 @@ export default function TicketList() {
   }, [tickets, searchTerm, statusFilter]);
 
   return (
-    <Container sx={{ padding: 4, backgroundColor: "#f9f9f9", borderRadius: 2 }}>
-      <Typography variant="h4" gutterBottom>
-        Tickets
-      </Typography>
-
+    <Box
+      sx={{
+        maxWidth: "85%",
+        margin: "0 auto",
+      }}
+    >
       <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={3}
         sx={{
-          backgroundColor: "#fff",
-          padding: 2,
-          borderRadius: 1,
-          boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
+          padding: 4,
+          backgroundColor: "#f9f9f9",
+          borderRadius: 2,
         }}
       >
-        <TextField
-          variant="outlined"
-          placeholder="Buscar por código de ticket"
-          InputProps={{
-            startAdornment: <Search />,
+        <Typography variant="h4" gutterBottom>
+          Tickets
+        </Typography>
+
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={3}
+          sx={{
+            backgroundColor: "#fff",
+            padding: 2,
+            borderRadius: 1,
+            boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
           }}
-          size="small"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          sx={{ width: "40%" }}
+        >
+          <TextField
+            variant="outlined"
+            placeholder="Buscar por código de ticket"
+            InputProps={{
+              startAdornment: <Search />,
+            }}
+            size="small"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            sx={{ width: "40%" }}
+          />
+
+          <FormControl variant="outlined" size="small" sx={{ width: "20%" }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={statusFilter}
+              onChange={handleStatusFilterChange}
+              label="Status"
+            >
+              <MenuItem value="Todos">Todos</MenuItem>
+              <MenuItem value="Creado">Creado</MenuItem>
+              <MenuItem value="Ejecutado">Ejecutado</MenuItem>
+              <MenuItem value="Finalizado">Finalizado</MenuItem>
+              <MenuItem value="Cancelado">Cancelado</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              color="primary"
+              onClick={handleOpen}
+            >
+              Agregar Ticket
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<DownloadRounded />}
+              color="success"
+              onClick={() => exportTableToExcel(tickets)}
+            >
+              Exportar Excel
+            </Button>
+          </Box>
+        </Box>
+
+        <TableTickets
+          tickets={filteredTickets}
+          handleDelete={handleDelete}
+          handleStartTicket={handleStartTicket}
+          setTickets={handleStatusChange}
         />
 
-        <FormControl variant="outlined" size="small" sx={{ width: "20%" }}>
-          <InputLabel>Status</InputLabel>
-          <Select
-            value={statusFilter}
-            onChange={handleStatusFilterChange}
-            label="Status"
-          >
-            <MenuItem value="Todos">Todos</MenuItem>
-            <MenuItem value="Creado">Creado</MenuItem>
-            <MenuItem value="Ejecutado">Ejecutado</MenuItem>
-            <MenuItem value="Finalizado">Finalizado</MenuItem>
-            <MenuItem value="Cancelado">Cancelado</MenuItem>
-          </Select>
-        </FormControl>
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Create Ticket</DialogTitle>
+          <DialogContent>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Controller
+                name="link"
+                control={control}
+                defaultValue=""
+                rules={{ required: "Link is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Link"
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.link}
+                    helperText={errors.link?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="createdAt"
+                control={control}
+                defaultValue=""
+                rules={{ required: "Created At is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Fecha de creación"
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.ticketId}
+                    helperText={errors.ticketId?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="user"
+                control={control}
+                defaultValue=""
+                rules={{ required: "User is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Usuario"
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.user}
+                    helperText={errors.user?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="po"
+                control={control}
+                defaultValue=""
+                rules={{ required: "PO is required" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="PO"
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.po}
+                    helperText={errors.po?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="status"
+                control={control}
+                rules={{ required: "Status is required" }}
+                defaultValue="Creado"
+                render={({ field }) => (
+                  <FormControl
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.status}
+                  >
+                    <InputLabel>Status</InputLabel>
+                    <Select {...field} label="Status">
+                      <MenuItem value="Creado">Creado</MenuItem>
+                      <MenuItem value="Ejecutado">Ejecutado</MenuItem>
+                      <MenuItem value="Finalizado">Finalizado</MenuItem>
+                      <MenuItem value="Cancelado">Cancelado</MenuItem>
+                    </Select>
+                    {errors.status && (
+                      <FormHelperText>{errors.status.message}</FormHelperText>
+                    )}
+                  </FormControl>
+                )}
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose} color="secondary">
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit(onSubmit)} color="primary">
+              Create
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            color="primary"
-            onClick={handleOpen}
-          >
-            Agregar Ticket
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<DownloadRounded />}
-            color="success"
-            onClick={() => exportTableToExcel(tickets)}
-          >
-            Exportar Excel
-          </Button>
-        </Box>
-      </Box>
-
-      <TableTickets
-        tickets={filteredTickets}
-        handleDelete={handleDelete}
-        handleStartTicket={handleStartTicket}
-        setTickets={handleStatusChange}
-      />
-
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Create Ticket</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Controller
-              name="link"
-              control={control}
-              defaultValue=""
-              rules={{ required: "Link is required" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Link"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.link}
-                  helperText={errors.link?.message}
-                />
-              )}
-            />
-            <Controller
-              name="createdAt"
-              control={control}
-              defaultValue=""
-              rules={{ required: "Created At is required" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Fecha de creación"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.ticketId}
-                  helperText={errors.ticketId?.message}
-                />
-              )}
-            />
-            <Controller
-              name="user"
-              control={control}
-              defaultValue=""
-              rules={{ required: "User is required" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Usuario"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.user}
-                  helperText={errors.user?.message}
-                />
-              )}
-            />
-            <Controller
-              name="po"
-              control={control}
-              defaultValue=""
-              rules={{ required: "PO is required" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="PO"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.po}
-                  helperText={errors.po?.message}
-                />
-              )}
-            />
-            <Controller
-              name="status"
-              control={control}
-              rules={{ required: "Status is required" }}
-              defaultValue="Creado"
-              render={({ field }) => (
-                <FormControl fullWidth margin="normal" error={!!errors.status}>
-                  <InputLabel>Status</InputLabel>
-                  <Select {...field} label="Status">
-                    <MenuItem value="Creado">Creado</MenuItem>
-                    <MenuItem value="Ejecutado">Ejecutado</MenuItem>
-                    <MenuItem value="Finalizado">Finalizado</MenuItem>
-                    <MenuItem value="Cancelado">Cancelado</MenuItem>
-                  </Select>
-                  {errors.status && (
-                    <FormHelperText>{errors.status.message}</FormHelperText>
-                  )}
-                </FormControl>
-              )}
-            />
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit(onSubmit)} color="primary">
-            Create
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={openStartTicket} onClose={handleCloseStartTicket}>
-        <DialogTitle>Iniciar Ticket</DialogTitle>
-        <DialogContent>
-          <Typography>Iniciar el ticket: {currentTicket?.ticketId}</Typography>
-          <Typography>Usuario: {currentTicket?.user}</Typography>
-          <Typography>Status: {currentTicket?.status}</Typography>
-          <form onSubmit={handleSubmit(onSubmitStart)}>
-            <Controller
-              name="configFile"
-              control={control}
-              defaultValue={currentTicket?.configFile || ""}
-              rules={{ required: "Config file es requerido" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Config File"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.configFile}
-                  helperText={errors.configFile?.message}
-                />
-              )}
-            />
-            <Controller
-              name="runtaskFile"
-              control={control}
-              defaultValue={currentTicket?.runtaskFile || ""}
-              rules={{ required: "Runtask file es requerido" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Runtask File"
-                  fullWidth
-                  margin="normal"
-                  error={!!errors.runtaskFile}
-                  helperText={errors.runtaskFile?.message}
-                />
-              )}
-            />
-            {/* <Controller
+        <Dialog open={openStartTicket} onClose={handleCloseStartTicket}>
+          <DialogTitle>Iniciar Ticket</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Iniciar el ticket: {currentTicket?.ticketId}
+            </Typography>
+            <Typography>Usuario: {currentTicket?.user}</Typography>
+            <Typography>Status: {currentTicket?.status}</Typography>
+            <form onSubmit={handleSubmit(onSubmitStart)}>
+              <Controller
+                name="configFile"
+                control={control}
+                defaultValue={currentTicket?.configFile || ""}
+                rules={{ required: "Config file es requerido" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Config File"
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.configFile}
+                    helperText={errors.configFile?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="runtaskFile"
+                control={control}
+                defaultValue={currentTicket?.runtaskFile || ""}
+                rules={{ required: "Runtask file es requerido" }}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Runtask File"
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.runtaskFile}
+                    helperText={errors.runtaskFile?.message}
+                  />
+                )}
+              />
+              {/* <Controller
               name="description"
               control={control}
               defaultValue=""
@@ -416,23 +434,24 @@ export default function TicketList() {
                 />
               )}
             /> */}
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseStartTicket} color="secondary">
-            Cerrar
-          </Button>
-          <Button color="primary" onClick={handleSubmit(onSubmitStart)}>
-            Confirmar Inicio
-          </Button>
-        </DialogActions>
-      </Dialog>
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseStartTicket} color="secondary">
+              Cerrar
+            </Button>
+            <Button color="primary" onClick={handleSubmit(onSubmitStart)}>
+              Confirmar Inicio
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      <SnackbarTicket
-        openSnackbar={openSnackbar}
-        setOpenSnackbar={setOpenSnackbar}
-        snackbarMessage={snackbarMessage}
-      />
-    </Container>
+        <SnackbarTicket
+          openSnackbar={openSnackbar}
+          setOpenSnackbar={setOpenSnackbar}
+          snackbarMessage={snackbarMessage}
+        />
+      </Box>
+    </Box>
   );
 }

@@ -71,7 +71,7 @@ const TableTickets = (props: Props) => {
   ];
 
   return (
-    <Box style={{ height: 400, width: "100%" }}>
+    <Box style={{ height: "75vh", width: "100%" }}>
       {tickets.length > 0 ? (
         <DataGrid
           rows={tickets}
