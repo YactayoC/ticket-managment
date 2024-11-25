@@ -25,7 +25,16 @@ const TableTickets = (props: Props) => {
       headerName: "Link",
       width: 200,
       renderCell: (params) => (
-        <Link href={params.value} target="_blank" rel="noopener">
+        <Link
+          href={params.value}
+          target="_blank"
+          rel="noopener"
+          style={{
+            textDecoration: "none",
+            color: "#1A73E8",
+            fontWeight: 500,
+          }}
+        >
           {params.row.ticketId}
         </Link>
       ),
@@ -45,6 +54,14 @@ const TableTickets = (props: Props) => {
           onChange={(e) => handleStatusChange(params.row.id, e.target.value)}
           displayEmpty
           fullWidth
+          sx={{
+            backgroundColor: "#f8f9fa",
+            borderRadius: 2,
+            "& .MuiSelect-select": {
+              padding: "6px 8px",
+              fontSize: "0.875rem",
+            },
+          }}
         >
           <MenuItem value="Creado">Creado</MenuItem>
           <MenuItem value="Ejecutado">Ejecutado</MenuItem>
@@ -56,13 +73,25 @@ const TableTickets = (props: Props) => {
     {
       field: "Acciones",
       headerName: "Acciones",
-      width: 200,
+      width: 150,
       renderCell: (params) => (
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <IconButton onClick={() => handleDelete(params.row.id)}>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <IconButton
+            onClick={() => handleDelete(params.row.id)}
+            sx={{
+              color: "#D32F2F",
+              "&:hover": { color: "#B71C1C" },
+            }}
+          >
             <Delete />
           </IconButton>
-          <IconButton onClick={() => handleStartTicket(params.row)}>
+          <IconButton
+            onClick={() => handleStartTicket(params.row)}
+            sx={{
+              color: "#388E3C",
+              "&:hover": { color: "#2E7D32" },
+            }}
+          >
             <PlayArrow />
           </IconButton>
         </Box>
@@ -71,62 +100,87 @@ const TableTickets = (props: Props) => {
   ];
 
   return (
-    <Box style={{ height: "75vh", width: "100%" }}>
+    <Box
+      style={{ height: "75vh", width: "100%" }}
+      sx={{
+        backgroundColor: "#fff",
+        borderRadius: 3,
+        boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.1)",
+        padding: 2,
+      }}
+    >
       {tickets.length > 0 ? (
         <DataGrid
           rows={tickets}
           columns={columns}
-          pageSizeOptions={[5, 10]}
+          pageSizeOptions={[10, 20]}
           checkboxSelection={false}
           disableRowSelectionOnClick
           getRowClassName={(params) => {
             if (params.row.status === "Creado") return "status-creado";
             if (params.row.status === "Ejecutado") return "status-ejecucion";
-            if (params.row.status === "Cancelado") return "status-observacion";
+            if (params.row.status === "Cancelado") return "status-cancelado";
             if (params.row.status === "Finalizado") return "status-finalizado";
             return "";
           }}
           initialState={{
             pagination: {
               paginationModel: {
-                pageSize: 5,
+                pageSize: 10,
               },
             },
           }}
           sx={{
             "& .status-creado": {
-              backgroundColor: "#F3F4F6",
+              backgroundColor: "#E3F2FD",
               "&:hover": {
-                backgroundColor: "#e0e0e0",
+                backgroundColor: "#BBDEFB",
               },
             },
             "& .status-ejecucion": {
-              backgroundColor: "#FFF9C4",
+              backgroundColor: "#FFF8E1",
               "&:hover": {
-                backgroundColor: "#ffe08b",
+                backgroundColor: "#FFECB3",
               },
             },
-            "& .status-observacion": {
-              backgroundColor: "#F2DEDE",
+            "& .status-cancelado": {
+              backgroundColor: "#FFEBEE",
               "&:hover": {
-                backgroundColor: "#e6bcbc",
+                backgroundColor: "#FFCDD2",
               },
             },
             "& .status-finalizado": {
-              backgroundColor: "#DFF0D8",
+              backgroundColor: "#E8F5E9",
               "&:hover": {
-                backgroundColor: "#b2d8b2",
+                backgroundColor: "#C8E6C9",
               },
             },
             "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#e0e0e0",
+              backgroundColor: "#F5F5F5",
               color: "#333",
-              fontWeight: "bold",
+              fontWeight: 500,
+              textTransform: "uppercase",
+              fontSize: "0.875rem",
+            },
+            "& .MuiDataGrid-cell": {
+              fontSize: "0.875rem",
+              color: "#424242",
+            },
+            "& .MuiDataGrid-footerContainer": {
+              backgroundColor: "#F5F5F5",
             },
           }}
         />
       ) : (
-        <Typography variant="h6" align="center">
+        <Typography
+          variant="h6"
+          align="center"
+          sx={{
+            color: "#757575",
+            marginTop: 2,
+            fontWeight: 500,
+          }}
+        >
           No hay tickets creados
         </Typography>
       )}

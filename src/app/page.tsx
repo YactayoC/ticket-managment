@@ -16,7 +16,12 @@ import {
   Box,
   SelectChangeEvent,
 } from "@mui/material";
-import { Add, DownloadRounded, Search } from "@mui/icons-material";
+import {
+  Add,
+  ClearRounded,
+  DownloadRounded,
+  Search,
+} from "@mui/icons-material";
 import { useForm, Controller } from "react-hook-form";
 import { Ticket, TicketStatus } from "./interfaces/Ticket";
 import TableTickets from "./components/TableTickets";
@@ -75,21 +80,21 @@ export default function TicketList() {
 
   const onSubmitStart = (data: Ticket) => {
     const baseConfigFile = data.configFile.split(".")[0];
-    const baseConfigFileExtension = data.configFile.split(".")[1];
+    // const baseConfigFileExtension = data.configFile.split(".")[1];
     const baseRuntaskFile = data.runtaskFile.split(".")[0];
-    const baseRuntaskFileExtension = data.runtaskFile.split(".")[1];
+    // const baseRuntaskFileExtension = data.runtaskFile.split(".")[1];
 
-    if (baseConfigFileExtension !== "config" || !baseConfigFileExtension) {
-      setSnackbarMessage("Config file debe ser de tipo .config");
-      setOpenSnackbar(true);
-      return;
-    }
+    // if (baseConfigFileExtension !== "conf" || !baseConfigFileExtension) {
+    //   setSnackbarMessage("Config file debe ser de tipo .config");
+    //   setOpenSnackbar(true);
+    //   return;
+    // }
 
-    if (baseRuntaskFileExtension !== "runtask" || !baseRuntaskFileExtension) {
-      setSnackbarMessage("Runtask file debe ser de tipo .runtask");
-      setOpenSnackbar(true);
-      return;
-    }
+    // if (baseRuntaskFileExtension !== "runtask" || !baseRuntaskFileExtension) {
+    //   setSnackbarMessage("Runtask file debe ser de tipo .runtask");
+    //   setOpenSnackbar(true);
+    //   return;
+    // }
 
     if (baseConfigFile !== baseRuntaskFile) {
       setSnackbarMessage(
@@ -133,6 +138,10 @@ export default function TicketList() {
     },
     [tickets]
   );
+
+  const handleDeleteAllTickets = () => {
+    setTickets([]);
+  };
 
   const handleStartTicket = useCallback((ticket: Ticket) => {
     setCurrentTicket(ticket);
@@ -259,6 +268,14 @@ export default function TicketList() {
               onClick={() => exportTableToExcel(tickets)}
             >
               Exportar Excel
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<ClearRounded />}
+              color="error"
+              onClick={() => handleDeleteAllTickets()}
+            >
+              Limpiar Tickets
             </Button>
           </Box>
         </Box>
@@ -415,24 +432,6 @@ export default function TicketList() {
                   />
                 )}
               />
-              {/* <Controller
-              name="description"
-              control={control}
-              defaultValue=""
-              rules={{ required: "Description es requerida" }}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Descripción"
-                  fullWidth
-                  margin="normal"
-                  multiline
-                  rows={4}
-                  error={!!errors.description}
-                  helperText={errors.description?.message}
-                />
-              )}
-            /> */}
             </form>
           </DialogContent>
           <DialogActions>
