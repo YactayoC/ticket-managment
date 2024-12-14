@@ -64,6 +64,16 @@ export default function TicketList() {
   };
 
   const onSubmit = (data: Ticket) => {
+    const isDuplicateLink = tickets.some((ticket) => ticket.link === data.link);
+
+    if (isDuplicateLink) {
+      setSnackbarMessage(
+        "El link ya existe. Por favor, ingrese un link único."
+      );
+      setOpenSnackbar(true);
+      return;
+    }
+
     const dataTicketFormat = formatTicket(data);
     const newTicket: Ticket = {
       ...data,
@@ -73,6 +83,7 @@ export default function TicketList() {
           ? Math.max(...tickets.map((ticket) => ticket.id!)) + 1
           : 1,
     };
+
     setTickets([...tickets, newTicket]);
     reset();
     handleClose();
@@ -194,6 +205,21 @@ export default function TicketList() {
       )
     );
   }, [tickets, searchTerm, statusFilter]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+
+      exportTableToExcel(tickets);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [tickets]);
 
   return (
     <Box
