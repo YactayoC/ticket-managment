@@ -6,6 +6,7 @@ export const exportTableToExcel = (tickets: Ticket[]) => {
     [
       "Fecha Creación",
       "Ticket ID",
+      "Dependencia",
       "Link",
       "Usuario",
       "PO",
@@ -15,6 +16,7 @@ export const exportTableToExcel = (tickets: Ticket[]) => {
     ...tickets.map((ticket) => [
       ticket.createdAt,
       ticket.link.split("/").pop(),
+      ticket.dependency,
       { t: "s", v: ticket.link, l: { Target: ticket.link } },
       ticket.user,
       ticket.po,

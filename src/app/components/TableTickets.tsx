@@ -41,6 +41,7 @@ const TableTickets = (props: Props) => {
     },
     { field: "createdAt", headerName: "Created At", width: 150 },
     { field: "ticketId", headerName: "Ticket ID", width: 150 },
+    { field: "dependency", headerName: "Dependency", width: 150 },
     { field: "user", headerName: "User", width: 150 },
     { field: "po", headerName: "PO", width: 150 },
     { field: "folder", headerName: "Folder", width: 250 },

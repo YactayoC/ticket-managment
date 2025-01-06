@@ -2,6 +2,7 @@ export interface Ticket {
   id: number | null;
   createdAt: string;
   link: string;
+  dependency: string;
   user: string;
   po: string;
   ticketId: string;

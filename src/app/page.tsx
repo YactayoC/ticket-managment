@@ -241,6 +241,7 @@ export default function TicketList() {
 
         <Box
           display="flex"
+          flexWrap="wrap"
           justifyContent="space-between"
           alignItems="center"
           mb={3}
@@ -249,6 +250,7 @@ export default function TicketList() {
             padding: 2,
             borderRadius: 1,
             boxShadow: "0px 2px 8px rgba(0,0,0,0.1)",
+            gap: 2,
           }}
         >
           <TextField
@@ -260,10 +262,20 @@ export default function TicketList() {
             size="small"
             value={searchTerm}
             onChange={handleSearchChange}
-            sx={{ width: "40%" }}
+            sx={{
+              flex: "1 1 300px",
+              minWidth: "200px",
+            }}
           />
 
-          <FormControl variant="outlined" size="small" sx={{ width: "20%" }}>
+          <FormControl
+            variant="outlined"
+            size="small"
+            sx={{
+              flex: "1 1 200px",
+              minWidth: "150px",
+            }}
+          >
             <InputLabel>Status</InputLabel>
             <Select
               value={statusFilter}
@@ -278,12 +290,22 @@ export default function TicketList() {
             </Select>
           </FormControl>
 
-          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 1,
+              alignItems: "center",
+              justifyContent: "flex-end",
+              flex: "1 1 auto",
+            }}
+          >
             <Button
               variant="contained"
               startIcon={<Add />}
               color="primary"
               onClick={handleOpen}
+              sx={{ flex: "1 1 auto", minWidth: "120px" }}
             >
               Agregar Ticket
             </Button>
@@ -292,6 +314,7 @@ export default function TicketList() {
               startIcon={<DownloadRounded />}
               color="success"
               onClick={() => exportTableToExcel(tickets)}
+              sx={{ flex: "1 1 auto", minWidth: "120px" }}
             >
               Exportar Excel
             </Button>
@@ -300,6 +323,7 @@ export default function TicketList() {
               startIcon={<ClearRounded />}
               color="error"
               onClick={() => handleDeleteAllTickets()}
+              sx={{ flex: "1 1 auto", minWidth: "120px" }}
             >
               Limpiar Tickets
             </Button>
@@ -331,6 +355,30 @@ export default function TicketList() {
                     error={!!errors.link}
                     helperText={errors.link?.message}
                   />
+                )}
+              />
+              <Controller
+                name="dependency"
+                control={control}
+                defaultValue="Creado"
+                render={({ field }) => (
+                  <FormControl
+                    fullWidth
+                    margin="normal"
+                    error={!!errors.status}
+                  >
+                    <InputLabel>Dependencia</InputLabel>
+                    <Select {...field} label="Status">
+                      {tickets.map((ticket) => (
+                        <MenuItem key={ticket.id} value={ticket.ticketId}>
+                          {ticket.ticketId}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.status && (
+                      <FormHelperText>{errors.status.message}</FormHelperText>
+                    )}
+                  </FormControl>
                 )}
               />
               <Controller
